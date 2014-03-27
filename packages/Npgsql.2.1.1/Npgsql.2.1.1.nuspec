@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+  <metadata>
+    <id>Npgsql</id>
+    <version>2.1.1</version>
+    <title>Npgsql</title>
+    <authors>Francisco Figueiredo Jr.,  Josh Cooley,  Dave Page,  Jon Asher,  Brar Piening,  Chris Morgan,  Hiroshi Saito,  Jon Hanna,  Federico Di Gregorio,  Glen Parker,  Shay Rojansky</authors>
+    <owners>Francisco Figueiredo Jr.,  Josh Cooley,  Dave Page,  Jon Asher,  Brar Piening,  Chris Morgan,  Hiroshi Saito,  Jon Hanna,  Federico Di Gregorio,  Glen Parker,  Shay Rojansky</owners>
+    <licenseUrl>https://github.com/npgsql/Npgsql/wiki/License</licenseUrl>
+    <projectUrl>https://github.com/npgsql/Npgsql</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Npgsql is a .Net data provider for Postgresql. It allows any program developed for .Net framework to access database server. It is implemented in 100% C# code. Works with Postgresql 7.x and above.</description>
+    <summary>Npgsql is a .Net data provider for Postgresql.</summary>
+    <releaseNotes>This release contains a single last minute patch to fix HasRows property: Return true from NpgsqlDataReader.HasRows even after all rows have been read https://github.com/npgsql/Npgsql/pull/181
+
+If you aren't affected by this bug, you don't need to download this version again.</releaseNotes>
+    <copyright>Copyright 2002 - 2014 Npgsql Development Team</copyright>
+    <language>en-US</language>
+    <tags>Npgsql postgres data database Postgresql</tags>
+  </metadata>
+</package>
