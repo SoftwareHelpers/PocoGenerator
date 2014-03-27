@@ -138,19 +138,6 @@ namespace PocoGenerator.Application.ViewModel
         }
 
         /// <summary>
-        /// Gets select command.
-        /// </summary>
-        public RelayCommand DirectoryBrowserCommand
-        {
-            get
-            {
-                return this.directoryBrowserCommand
-                       ?? (this.directoryBrowserCommand =
-                           new RelayCommand(this.OnDirectoryBrowserClicked));
-            }
-        }
-
-        /// <summary>
         /// Gets or sets the databases list.
         /// </summary>
         public List<DatabaseName> DatabasesList
@@ -273,23 +260,7 @@ namespace PocoGenerator.Application.ViewModel
             var code = this.codeGenerator.CodeWriter(rootNamespace, this.selectedTableName, this.FieldsList);
             var classFilePath = Path.Combine(this.FullPath, string.Format(CultureInfo.InvariantCulture, "{0}.cs", this.selectedTableName));
             File.WriteAllText(classFilePath, code);
-            this.project.AddFile(classFilePath);
-        }
-
-        /// <summary>
-        /// The on directory browser clicked.
-        /// </summary>
-        private void OnDirectoryBrowserClicked()
-        {
-            ////var directoryBrowser = new Microsoft.Win32.OpenFileDialog();
-            ////var dialogResult = directoryBrowser.ShowDialog();
-            ////directoryBrowser.Title = "Select Folder";
-            ////var project = this.projectManager.Projects.FirstOrDefault();
-            ////directoryBrowser.InitialDirectory = project.GetProjectDir();
-            ////if (dialogResult != null && dialogResult.Value)
-            ////{
-            ////    this.FullPath = directoryBrowser.FileName;
-            ////}
+            this.project.ProjectItems.AddFromFile(classFilePath);
         }
 
         /// <summary>
