@@ -201,7 +201,7 @@ namespace PocoGenerator.Base.DatabaseManager
                 return;
             }
 
-            this.databaseConnection.ConnectionString = ConfigurationManager.ConnectionStrings["SqlDb"].ConnectionString;
+            this.databaseConnection.ConnectionString = @"Data Source=192.168.170.81\SQLWEB;Initial Catalog=RND;Integrated Security=false;user=Palak;password=Palak123;MultipleActiveResultSets=true";
             this.connectionString = this.databaseConnection.ConnectionString;
         }
 
@@ -210,7 +210,7 @@ namespace PocoGenerator.Base.DatabaseManager
         /// </summary>
         private void CreatePostgreConnection()
         {
-            var postgreConnectionString = ConfigurationManager.ConnectionStrings["PostgreDb"].ConnectionString;
+            var postgreConnectionString = @"Server=localhost;Port=5432;User Id=postgres;Password=Palak123;Database=RND;";
             this.databaseConnection = new NpgsqlConnection(postgreConnectionString);
             this.connectionString = this.databaseConnection.ConnectionString;
         }

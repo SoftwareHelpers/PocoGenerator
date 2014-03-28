@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 
 namespace PocoGenerator.Base.Common
 {
+    using System.Windows.Threading;
+
     public static class CustomExtensions
     {
         public static List<T> SaveRest<T>(this IEnumerator<T> enumerator)
@@ -16,6 +18,18 @@ namespace PocoGenerator.Base.Common
                 list.Add(enumerator.Current);
             }
             return list;
+        }
+
+        public static void CheckBeginInvokeOnUi(this Dispatcher dispatcher, Action action)
+        {
+            if (dispatcher.CheckAccess())
+            {
+                action();
+            }
+            else
+            {
+                dispatcher.BeginInvoke(action);
+            }
         }
     }
 }
