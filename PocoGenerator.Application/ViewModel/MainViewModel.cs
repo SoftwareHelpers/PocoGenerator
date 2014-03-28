@@ -268,8 +268,8 @@ namespace PocoGenerator.Application.ViewModel
         /// </summary>
         private void PopulateDatabases()
         {
-            var connect = DatabaseOperations.ExecuteReader<DatabaseName>("select Name from master.dbo.sysdatabases", DatabaseConnectionEnum.Sql);
-            this.DatabasesList = connect.SaveRest();
+            ////var connect = DatabaseOperations.ExecuteReader<DatabaseName>("select Name from master.dbo.sysdatabases", DatabaseConnectionEnum.Sql);
+            ////this.DatabasesList = connect.SaveRest();
         }
 
         /// <summary>
@@ -277,8 +277,8 @@ namespace PocoGenerator.Application.ViewModel
         /// </summary>
         private void PopulateTables()
         {
-            var connect = DatabaseOperations.ExecuteReader<TableName>("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES", DatabaseConnectionEnum.Sql);
-            this.TablesList = connect.SaveRest();
+            ////var connect = DatabaseOperations.ExecuteReader<TableName>("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES", DatabaseConnectionEnum.Sql);
+            ////this.TablesList = connect.SaveRest();
         }
 
         /// <summary>
@@ -289,7 +289,7 @@ namespace PocoGenerator.Application.ViewModel
         /// </param>
         private void PopulateFields(string tableName)
         {
-            this.FieldsList = DatabaseOperations.ExecuteReaderEx("select * from " + tableName, DatabaseConnectionEnum.Sql);
+            /////this.FieldsList = DatabaseOperations.ExecuteReaderEx("select * from " + tableName, DatabaseConnectionEnum.Sql);
         }
     }
 }

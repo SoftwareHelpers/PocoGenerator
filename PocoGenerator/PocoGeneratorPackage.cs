@@ -55,6 +55,11 @@ namespace Company.PocoGenerator
         /// </summary>
         private void ShowToolWindow(object sender, EventArgs e)
         {
+            this.ShowToolWindowEx();
+        }
+
+        private void ShowToolWindowEx()
+        {
             // Get the instance number 0 of this tool window. This window is single instance so this instance
             // is actually the only one.
             // The last flag is set to true so that if the tool window does not exists it will be created.
@@ -66,7 +71,6 @@ namespace Company.PocoGenerator
             IVsWindowFrame windowFrame = (IVsWindowFrame)window.Frame;
             Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(windowFrame.Show());
         }
-
 
         /////////////////////////////////////////////////////////////////////////////
         // Overridden Package Implementation
@@ -104,23 +108,23 @@ namespace Company.PocoGenerator
         /// </summary>
         private void MenuItemCallback(object sender, EventArgs e)
         {
-            // Show a Message Box to prove we were here
-            IVsUIShell uiShell = (IVsUIShell)GetService(typeof(SVsUIShell));
-            Guid clsid = Guid.Empty;
-            int result;
-            Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(uiShell.ShowMessageBox(
-                       0,
-                       ref clsid,
-                       "PocoGenerator",
-                       string.Format(CultureInfo.CurrentCulture, "Inside {0}.MenuItemCallback()", this.ToString()),
-                       string.Empty,
-                       0,
-                       OLEMSGBUTTON.OLEMSGBUTTON_OK,
-                       OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST,
-                       OLEMSGICON.OLEMSGICON_INFO,
-                       0,        // false
-                       out result));
+            this.ShowToolWindowEx();
+            ////// Show a Message Box to prove we were here
+            ////IVsUIShell uiShell = (IVsUIShell)GetService(typeof(SVsUIShell));
+            ////Guid clsid = Guid.Empty;
+            ////int result;
+            ////Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(uiShell.ShowMessageBox(
+            ////           0,
+            ////           ref clsid,
+            ////           "PocoGenerator",
+            ////           string.Format(CultureInfo.CurrentCulture, "Inside {0}.MenuItemCallback()", this.ToString()),
+            ////           string.Empty,
+            ////           0,
+            ////           OLEMSGBUTTON.OLEMSGBUTTON_OK,
+            ////           OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST,
+            ////           OLEMSGICON.OLEMSGICON_INFO,
+            ////           0,        // false
+            ////           out result));
         }
-
     }
 }

@@ -9,6 +9,7 @@ namespace PocoGenerator.Base.DatabaseManager
     using System.Configuration;
     using System.Data;
     using System.Data.Common;
+    using System.Globalization;
 
     using Npgsql;
 
@@ -35,15 +36,15 @@ namespace PocoGenerator.Base.DatabaseManager
         /// <param name="databaseConnectionEnum">
         /// The database connection enumeration.
         /// </param>
-        public DatabaseConnection(DatabaseConnectionEnum databaseConnectionEnum)
+        public DatabaseConnection(DatabaseConnectionEnum databaseConnectionEnum, string servername, string username, string password)
         {
             if (databaseConnectionEnum.Equals(DatabaseConnectionEnum.Sql))
             {
-                this.CreateSqlConnection();
+                this.CreateSqlConnection(servername, username, password);
             }
             else if (databaseConnectionEnum.Equals(DatabaseConnectionEnum.Postgre))
             {
-                this.CreatePostgreConnection();
+                this.CreatePostgreConnection(servername, username, password);
             }
         }
 
@@ -191,7 +192,7 @@ namespace PocoGenerator.Base.DatabaseManager
         /// <summary>
         /// The open sql connection.
         /// </summary>
-        private void CreateSqlConnection()
+        private void CreateSqlConnection(string servername, string username, string password)
         {
             var databaseProviderFactories = DbProviderFactories.GetFactory("System.Data.SqlClient");
             this.databaseConnection = databaseProviderFactories.CreateConnection();
@@ -201,16 +202,21 @@ namespace PocoGenerator.Base.DatabaseManager
                 return;
             }
 
-            this.databaseConnection.ConnectionString = @"Data Source=192.168.170.81\SQLWEB;Initial Catalog=RND;Integrated Security=false;user=Palak;password=Palak123;MultipleActiveResultSets=true";
+            this.databaseConnection.ConnectionString = string.Format(CultureInfo.InvariantCulture, "Data Source={0};Integrated Security=false;user={1};password={2};MultipleActiveResultSets=true", servername, username, password);
+            ////this.databaseConnection.ConnectionString = @"Data Source=192.168.170.81\SQLWEB;Initial Catalog=RND;Integrated Security=false;user=Palak;password=Palak123;MultipleActiveResultSets=true";
             this.connectionString = this.databaseConnection.ConnectionString;
         }
 
         /// <summary>
         /// The open postgre connection.
         /// </summary>
-        private void CreatePostgreConnection()
+        private void CreatePostgreConnection(string servername, string username, string password)
         {
-            var postgreConnectionString = @"Server=localhost;Port=5432;User Id=postgres;Password=Palak123;Database=RND;";
+            var array = servername.Split(new[] { ':' }, StringSplitOptions.RemoveEmptyEntries);
+
+            var postgreConnectionString = string.Format(CultureInfo.InvariantCulture, "Server={0};Port={1};User Id={2};Password={3};", array[0], array[1], username, password);
+
+            ////var postgreConnectionString = @"Server=localhost;Port=5432;User Id=postgres;Password=Palak123;Database=RND;";
             this.databaseConnection = new NpgsqlConnection(postgreConnectionString);
             this.connectionString = this.databaseConnection.ConnectionString;
         }

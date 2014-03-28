@@ -3,10 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             Background="{DynamicResource VsBrush.Window}"
-             Foreground="{DynamicResource VsBrush.WindowText}"
-             mc:Ignorable="d"
-             d:DesignHeight="300" d:DesignWidth="300">
+             mc:Ignorable="d" Loaded="OnLoaded">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -14,14 +11,31 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <Grid Grid.Row="0" Margin="10">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
-            <RadioButton GroupName="Database" Content="SQL" Grid.Column="0" />
-            <RadioButton GroupName="Database" Content="PostGreSql" Grid.Column="1" />
+            <RadioButton x:Name="RadioButtonSql" GroupName="Database" Content="SQL" Grid.Column="0" Grid.Row="0" Margin="5" IsChecked="True" />
+            <RadioButton x:Name="RadioButtonPostGre" GroupName="Database" Content="PostGreSql" Grid.Column="1" Grid.Row="0" Margin="5"/>
+            <TextBlock Grid.Column="0" Grid.Row="1" Text="Server Name: " Margin="5" />
+            <TextBox x:Name="TxtServerName" Grid.Column="1" Grid.Row="1"   Margin="5" Width="150"/>
+            <TextBlock Grid.Column="0" Grid.Row="2" Text="User Name: "  Margin="5"/>
+            <TextBox x:Name="TxtUserName" Grid.Column="1" Grid.Row="2"   Margin="5" Width="150"/>
+            <TextBlock Grid.Column="2" Grid.Row="2" Text="Password: "  Margin="5"/>
+            <TextBox x:Name="TxtPassword" Grid.Column="3" Grid.Row="2"   Margin="5" Width="150"/>
+            <Button x:Name="BtnTestConnection" Grid.Column="0" Grid.Row="3" Content="Test Connection" Margin="5" Click="OnTestConnectionButtonClick"/>
         </Grid>
-        <Grid Grid.Row="1" Margin="10" >
+        <Grid x:Name="GridDetail" Grid.Row="1" Margin="10" >
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="*" />
@@ -33,34 +47,40 @@
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
                 <TextBlock Text="Select DataBase:" Grid.Row="0"/>
-                <ListBox x:Name="DatabaseList" DisplayMemberPath="Name" Grid.Row="1" ScrollViewer.CanContentScroll="True" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Auto" SelectionChanged="DatabaseList_OnSelectionChanged" />
+                <ListBox x:Name="DatabaseList" DisplayMemberPath="Name" Grid.Row="1" ScrollViewer.CanContentScroll="True" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Auto" SelectionChanged="OnDatabaseListSelectionChanged" />
             </Grid>
             <Grid Grid.Column="1" Margin="5">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
                 <TextBlock Text="Select Table:" Grid.Row="0"/>
-                <ListBox x:Name="TablesList" DisplayMemberPath="TABLE_NAME" Grid.Row="1" ScrollViewer.CanContentScroll="True" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Auto" SelectionChanged="TablesList_OnSelectionChanged" />
+                <ListBox x:Name="TablesList" DisplayMemberPath="TABLE_NAME" Grid.Row="1" ScrollViewer.CanContentScroll="True" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Auto" SelectionChanged="OnTablesListSelectionChanged" />
             </Grid>
             <Grid Grid.Column="2" Margin="5">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
                 <TextBlock Text="Select Primary Key:" Grid.Row="0"/>
-                <ListBox  x:Name="FieldsList" DisplayMemberPath="Name" Grid.Row="1" ScrollViewer.CanContentScroll="True" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Auto" SelectionChanged="FieldsList_OnSelectionChanged" />
+                <ListBox  x:Name="FieldsList" DisplayMemberPath="Name" Grid.Row="1" ScrollViewer.CanContentScroll="True" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Auto" SelectionChanged="OnFieldsListSelectionChanged" />
             </Grid>
         </Grid>
-        <Grid Grid.Row="2" Margin="10">
+        <Grid x:Name="GridGenerate" Grid.Row="2" Margin="10" IsEnabled="False">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
-            <TextBlock Text="Project Directory: " Grid.Column="0"></TextBlock>
-            <TextBlock x:Name="ProjectPath" Grid.Column="1" Margin="10,0"/>
-            <Button Grid.Column="2" Content="Generate" Width="125" HorizontalAlignment="Right" VerticalAlignment="Center" Click="button1_Click" Margin="10,0"/>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <TextBlock Text="Select Project: " Grid.Column="0" Grid.Row="0" VerticalAlignment="Center" />
+            <TextBlock Text="Select Directory: " Grid.Column="0" Grid.Row="1" VerticalAlignment="Top"  />
+            <ListBox x:Name="DirectoryListBox" Grid.Column="1" Grid.Row="1" ScrollViewer.CanContentScroll="True" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Auto" Margin="10"/>
+            <ComboBox x:Name="ProjectsComboBox" DisplayMemberPath="Name" Grid.Column="1" Grid.Row="0" Margin="10,0" SelectionChanged="OnProjectsComboBoxSelectionChanged"/>
+            <Button Grid.Column="2" Grid.Row="0" Content="Generate" Width="125" HorizontalAlignment="Right" VerticalAlignment="Center" Click="OnGenerateButtonClick" Margin="10,0"/>
         </Grid>
     </Grid>
 </UserControl>

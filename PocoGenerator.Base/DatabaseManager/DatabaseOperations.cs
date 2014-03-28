@@ -17,15 +17,37 @@ namespace PocoGenerator.Base.DatabaseManager
     /// </summary>
     public static class DatabaseOperations
     {
+        public static bool TestConnection(DatabaseConnectionEnum databaseConnectionEnum, string servername, string username, string password)
+        {
+            using (var connectionFactory = new DatabaseConnection(databaseConnectionEnum, servername, username, password))
+            {
+                using (var connection = connectionFactory.GetConnection())
+                {
+                    if (connection.State.Equals(ConnectionState.Open))
+                    {
+                        connection.Close();
+                    }
+
+                    connection.Open();
+                    if (connection.State == ConnectionState.Open)
+                    {
+                        return true;
+                    }
+
+                    return false;
+                }
+            }
+        }
+
         /// <summary>
         /// The execute non query.
         /// </summary>
         /// <param name="commandText"> The command text. </param>
         /// <param name="databaseConnectionEnum"> The database connection enumeration. </param>
         /// <returns> The <see cref="int"/>. </returns>
-        public static int ExecuteNonQuery(string commandText, DatabaseConnectionEnum databaseConnectionEnum)
+        public static int ExecuteNonQuery(string commandText, DatabaseConnectionEnum databaseConnectionEnum, string serverName, string userName, string password)
         {
-            using (var connectionFactory = new DatabaseConnection(databaseConnectionEnum))
+            using (var connectionFactory = new DatabaseConnection(databaseConnectionEnum, serverName, userName, password))
             {
                 using (var connection = connectionFactory.GetConnection())
                 {
@@ -53,9 +75,9 @@ namespace PocoGenerator.Base.DatabaseManager
         /// <param name="databaseConnectionEnum"> The database connection enumeration. </param>
         /// <typeparam name="T">Type of parameter </typeparam>
         /// <returns> The <see cref="Dictionary{TKey,TValue}.Enumerator"/>. </returns>
-        public static IEnumerator<T> ExecuteReader<T>(string commandText, DatabaseConnectionEnum databaseConnectionEnum)
+        public static IEnumerator<T> ExecuteReader<T>(string commandText, DatabaseConnectionEnum databaseConnectionEnum, string serverName, string userName, string password)
         {
-            using (var connectionFactory = new DatabaseConnection(databaseConnectionEnum))
+            using (var connectionFactory = new DatabaseConnection(databaseConnectionEnum, serverName, userName, password))
             {
                 using (var connection = connectionFactory.GetConnection())
                 {
@@ -83,9 +105,9 @@ namespace PocoGenerator.Base.DatabaseManager
         /// <param name="commandText"> The command text. </param>
         /// <param name="databaseConnectionEnum"> The database connection enumeration. </param>
         /// <returns> The <see cref="IDataReader"/>. </returns>
-        public static List<FieldDetails> ExecuteReaderEx(string commandText, DatabaseConnectionEnum databaseConnectionEnum)
+        public static List<FieldDetails> ExecuteReaderEx(string commandText, DatabaseConnectionEnum databaseConnectionEnum, string serverName, string userName, string password)
         {
-            using (var connectionFactory = new DatabaseConnection(databaseConnectionEnum))
+            using (var connectionFactory = new DatabaseConnection(databaseConnectionEnum, serverName, userName, password))
             {
                 using (var connection = connectionFactory.GetConnection())
                 {

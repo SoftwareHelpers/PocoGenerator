@@ -1,19 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace PocoGenerator.Base.CodeGenerator
+﻿namespace PocoGenerator.Base.CodeGenerator
 {
     using System.CodeDom.Compiler;
+    using System.Collections.Generic;
     using System.Globalization;
     using System.IO;
 
     using PocoGenerator.Base.Models;
 
     /// <summary>
-    /// The poco code generator.
+    /// The plain objects code generator.
     /// </summary>
     public class PocoCodeGenerator : ICodeGenerator
     {
@@ -22,18 +17,10 @@ namespace PocoGenerator.Base.CodeGenerator
         /// <summary>
         /// The code writer.
         /// </summary>
-        /// <param name="namespace">
-        /// The namespace.
-        /// </param>
-        /// <param name="nameofClass">
-        /// The nameof class.
-        /// </param>
-        /// <param name="fieldDetailses">
-        /// The field detailses.
-        /// </param>
-        /// <returns>
-        /// The <see cref="string"/>.
-        /// </returns>
+        /// <param name="namespace"> The name space. </param>
+        /// <param name="nameofClass"> The name of class. </param>
+        /// <param name="fieldDetailses"> The field details. </param>
+        /// <returns> The <see cref="string"/>. </returns>
         public string CodeWriter(string @namespace, string nameofClass, IEnumerable<FieldDetails> fieldDetailses)
         {
             using (var stringWriter = new StringWriter(CultureInfo.InvariantCulture))
@@ -62,7 +49,7 @@ namespace PocoGenerator.Base.CodeGenerator
         /// <param name="value"> The value. </param>
         /// <param name="writer"> The writer. </param>
         /// <param name="isPrimaryKey"> The is primary key. </param>
-        public static void WriteProperty(string name, string value, IndentedTextWriter writer, bool isPrimaryKey = false)
+        private static void WriteProperty(string name, string value, IndentedTextWriter writer, bool isPrimaryKey = false)
         {
             writer.WriteLine();
             if (isPrimaryKey)
@@ -85,16 +72,10 @@ namespace PocoGenerator.Base.CodeGenerator
         /// <summary>
         /// Generates a namespace, using statements and class definition.
         /// </summary>
-        /// <param name="namespace">
-        /// Namespace that code should be generated in. 
-        /// </param>
-        /// <param name="className">
-        /// Name of the class that should be generated. 
-        /// </param>
-        /// <param name="writer">
-        /// Text writer to add the generated code to. 
-        /// </param>
-        public static void WriteClassStart(string @namespace, string className, IndentedTextWriter writer)
+        /// <param name="namespace"> Namespace that code should be generated in.  </param>
+        /// <param name="className"> Name of the class that should be generated.  </param>
+        /// <param name="writer"> Text writer to add the generated code to.  </param>
+        private static void WriteClassStart(string @namespace, string className, IndentedTextWriter writer)
         {
             if (!string.IsNullOrWhiteSpace(@namespace))
             {
@@ -103,8 +84,7 @@ namespace PocoGenerator.Base.CodeGenerator
                 writer.WriteLine("{");
                 writer.Indent++;
             }
-
-            writer.WriteLine("using PocoGenerator.Base.Common;");
+            
             writer.Write("public ");
             writer.Write("class ");
             writer.Write(className);
@@ -117,7 +97,7 @@ namespace PocoGenerator.Base.CodeGenerator
         /// </summary>
         /// <param name="namespace"> Namespace that code should be generated in. </param>
         /// <param name="writer"> Text writer to add the generated code to. </param>
-        public static void WriteClassEnd(string @namespace, IndentedTextWriter writer)
+        private static void WriteClassEnd(string @namespace, IndentedTextWriter writer)
         {
             writer.Indent--;
             writer.WriteLine("}");
