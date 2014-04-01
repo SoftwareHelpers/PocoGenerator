@@ -10,6 +10,8 @@ using Microsoft.VisualStudio.Shell;
 
 namespace Company.PocoGenerator
 {
+    using EnvDTE;
+
     /// <summary>
     /// This class implements the tool window exposed by this package and hosts a user control.
     ///

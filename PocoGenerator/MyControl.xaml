@@ -1,13 +1,11 @@
 ﻿<UserControl x:Class="Company.PocoGenerator.MyControl"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             mc:Ignorable="d" Loaded="OnLoaded">
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Loaded="OnLoaded" >
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <Grid Grid.Row="0" Margin="10">
@@ -33,9 +31,9 @@
             <TextBox x:Name="TxtUserName" Grid.Column="1" Grid.Row="2"   Margin="5" Width="150"/>
             <TextBlock Grid.Column="2" Grid.Row="2" Text="Password: "  Margin="5"/>
             <TextBox x:Name="TxtPassword" Grid.Column="3" Grid.Row="2"   Margin="5" Width="150"/>
-            <Button x:Name="BtnTestConnection" Grid.Column="0" Grid.Row="3" Content="Test Connection" Margin="5" Click="OnTestConnectionButtonClick"/>
+            <Button x:Name="BtnTestConnection" Grid.Column="0" Grid.Row="3" Content="Test Connection" Margin="5" Click="OnTestConnectionButtonClick" />
         </Grid>
-        <Grid x:Name="GridDetail" Grid.Row="1" Margin="10" >
+        <Grid x:Name="GridDetail" Grid.Row="1" Margin="10">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="*" />
@@ -47,7 +45,7 @@
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
                 <TextBlock Text="Select DataBase:" Grid.Row="0"/>
-                <ListBox x:Name="DatabaseList" DisplayMemberPath="Name" Grid.Row="1" ScrollViewer.CanContentScroll="True" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Auto" SelectionChanged="OnDatabaseListSelectionChanged" />
+                <ListBox x:Name="DatabaseList" DisplayMemberPath="Name" Grid.Row="1" ScrollViewer.CanContentScroll="True" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Auto" SelectionChanged="OnDatabaseListSelectionChanged"/>
             </Grid>
             <Grid Grid.Column="1" Margin="5">
                 <Grid.RowDefinitions>
@@ -55,7 +53,7 @@
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
                 <TextBlock Text="Select Table:" Grid.Row="0"/>
-                <ListBox x:Name="TablesList" DisplayMemberPath="TABLE_NAME" Grid.Row="1" ScrollViewer.CanContentScroll="True" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Auto" SelectionChanged="OnTablesListSelectionChanged" />
+                <ListBox x:Name="TablesList" DisplayMemberPath="TABLE_NAME" Grid.Row="1" ScrollViewer.CanContentScroll="True" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Auto" SelectionChanged="OnTablesListSelectionChanged"/>
             </Grid>
             <Grid Grid.Column="2" Margin="5">
                 <Grid.RowDefinitions>
@@ -63,24 +61,42 @@
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
                 <TextBlock Text="Select Primary Key:" Grid.Row="0"/>
-                <ListBox  x:Name="FieldsList" DisplayMemberPath="Name" Grid.Row="1" ScrollViewer.CanContentScroll="True" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Auto" SelectionChanged="OnFieldsListSelectionChanged" />
+                <ListBox x:Name="FieldsList" DisplayMemberPath="Name" Grid.Row="1" ScrollViewer.CanContentScroll="True" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Auto" SelectionChanged="OnFieldsListSelectionChanged" />
             </Grid>
         </Grid>
-        <Grid x:Name="GridGenerate" Grid.Row="2" Margin="10" IsEnabled="False">
+        <Grid Grid.Row="2" Margin="10">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="0.7*"/>
             </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
-            <TextBlock Text="Select Project: " Grid.Column="0" Grid.Row="0" VerticalAlignment="Center" />
-            <TextBlock Text="Select Directory: " Grid.Column="0" Grid.Row="1" VerticalAlignment="Top"  />
-            <ListBox x:Name="DirectoryListBox" Grid.Column="1" Grid.Row="1" ScrollViewer.CanContentScroll="True" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Auto" Margin="10"/>
-            <ComboBox x:Name="ProjectsComboBox" DisplayMemberPath="Name" Grid.Column="1" Grid.Row="0" Margin="10,0" SelectionChanged="OnProjectsComboBoxSelectionChanged"/>
-            <Button Grid.Column="2" Grid.Row="0" Content="Generate" Width="125" HorizontalAlignment="Right" VerticalAlignment="Center" Click="OnGenerateButtonClick" Margin="10,0"/>
+            <TextBlock Text="Select Project" Grid.Column="1" Grid.Row="1" Margin="2"/>
+            <TextBlock Text="Select Directory" Grid.Column="2" Grid.Row="1" Margin="2"/>
+            <CheckBox x:Name="CheckBoxPoco" Content="Generate POCO" Grid.Column="0" Grid.Row="2" VerticalAlignment="Center" Margin="2" />
+            <ComboBox x:Name="ComboBoxPocoProjects" DisplayMemberPath="Name" Grid.Column="1" Grid.Row="2" Margin="2" IsEnabled="{Binding ElementName=CheckBoxPoco, Path=IsChecked}" SelectionChanged="OnProjectsComboBoxSelectionChanged"/>
+            <ComboBox x:Name="ComboBoxPocoDirectories" DisplayMemberPath="Name" Grid.Column="2" Grid.Row="2" Margin="2" IsEnabled="{Binding ElementName=CheckBoxPoco, Path=IsChecked}"/>
+
+            <CheckBox x:Name="CheckBoxDto" Content="Generate DTO" Grid.Column="0" Grid.Row="3" VerticalAlignment="Center" Margin="2" />
+            <ComboBox x:Name="ComboBoxDtoProjects" DisplayMemberPath="Name" Grid.Column="1" Grid.Row="3" Margin="2" IsEnabled="{Binding ElementName=CheckBoxDto, Path=IsChecked}"/>
+            <ComboBox x:Name="ComboBoxDtoDirectories" DisplayMemberPath="Name" Grid.Column="2" Grid.Row="3" Margin="2" IsEnabled="{Binding ElementName=CheckBoxDto, Path=IsChecked}"/>
+
+            <CheckBox x:Name="CheckBoxMapper" Content="Generate Mappers" Grid.Column="0" Grid.Row="4" VerticalAlignment="Center" Margin="2" />
+            <ComboBox x:Name="ComboBoxMapperProjects" DisplayMemberPath="Name" Grid.Column="1" Grid.Row="4" Margin="2" IsEnabled="{Binding ElementName=CheckBoxMapper, Path=IsChecked}"/>
+            <ComboBox x:Name="ComboBoxMapperDirectories" DisplayMemberPath="Name" Grid.Column="2" Grid.Row="4" Margin="2" IsEnabled="{Binding ElementName=CheckBoxMapper, Path=IsChecked}"/>
+
+            <CheckBox x:Name="CheckBoxRepo" Content="Generate Repositories" Grid.Column="0" Grid.Row="5" VerticalAlignment="Center" Margin="2" />
+            <ComboBox x:Name="ComboBoxRepoProjects" DisplayMemberPath="Name" Grid.Column="1" Grid.Row="5" Margin="2" IsEnabled="{Binding ElementName=CheckBoxRepo, Path=IsChecked}"/>
+            <ComboBox x:Name="ComboBoxRepoDirectories" DisplayMemberPath="Name" Grid.Column="2" Grid.Row="5" Margin="2" IsEnabled="{Binding ElementName=CheckBoxRepo, Path=IsChecked}"/>
         </Grid>
+        <Button Grid.Row="3" Content="Generate" Width="125" HorizontalAlignment="Right" VerticalAlignment="Center" Click="OnGenerateButtonClick" Margin="10"/>
     </Grid>
 </UserControl>

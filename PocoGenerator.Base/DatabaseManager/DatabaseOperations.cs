@@ -17,6 +17,14 @@ namespace PocoGenerator.Base.DatabaseManager
     /// </summary>
     public static class DatabaseOperations
     {
+        /// <summary>
+        /// The test connection.
+        /// </summary>
+        /// <param name="databaseConnectionEnum"> The database connection enumeration. </param>
+        /// <param name="servername"> The servername. </param>
+        /// <param name="username"> The username. </param>
+        /// <param name="password"> The password. </param>
+        /// <returns> The <see cref="bool"/>. </returns>
         public static bool TestConnection(DatabaseConnectionEnum databaseConnectionEnum, string servername, string username, string password)
         {
             using (var connectionFactory = new DatabaseConnection(databaseConnectionEnum, servername, username, password))

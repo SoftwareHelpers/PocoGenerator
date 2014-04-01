@@ -1,20 +1,28 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Windows;
-using System.Windows.Controls;
-
-namespace Company.PocoGenerator
+﻿namespace Company.PocoGenerator
 {
+    using System;
+    using System.Collections.Generic;
     using System.Globalization;
     using System.IO;
+    using System.Linq;
     using System.Runtime.InteropServices;
+    using System.Runtime.InteropServices.ComTypes;
+    using System.Windows;
+
     using EnvDTE;
+
+    using Extensibility;
+
     using global::PocoGenerator.Base.CodeGenerator;
     using global::PocoGenerator.Base.Common;
     using global::PocoGenerator.Base.DatabaseManager;
     using global::PocoGenerator.Base.Models;
     using global::PocoGenerator.Base.ProjectManager;
+    using System.Windows.Controls;
+
+    using Microsoft.VisualStudio.Shell.Interop;
+
+    using Process = System.Diagnostics.Process;
 
     /// <summary>
     /// The my control.
@@ -22,11 +30,6 @@ namespace Company.PocoGenerator
     public partial class MyControl : UserControl
     {
         #region Variables
-        /// <summary>
-        /// The target visual studio version.
-        /// </summary>
-        private const int targetVsVersion = 12;
-
         /// <summary>
         /// The server name.
         /// </summary>
@@ -73,9 +76,14 @@ namespace Company.PocoGenerator
         private DatabaseConnectionEnum databaseConnectionEnum;
 
         /// <summary>
-        /// The remove dir list.
+        /// The remove directory list.
         /// </summary>
         private List<string> removeDirList = new List<string> { "bin", "Properties", "obj" };
+
+        /// <summary>
+        /// The dte.
+        /// </summary>
+        private DTE dte;
 
         #endregion
 
@@ -86,7 +94,7 @@ namespace Company.PocoGenerator
         public MyControl()
         {
             this.InitializeComponent();
-        } 
+        }
         #endregion
 
         #region Properties
@@ -104,10 +112,11 @@ namespace Company.PocoGenerator
             {
                 this.fullPath = value;
             }
-        } 
+        }
         #endregion
 
         #region Events
+
         /// <summary>
         /// The button 1_ click.
         /// </summary>
@@ -178,12 +187,18 @@ namespace Company.PocoGenerator
             this.Dispatcher.CheckBeginInvokeOnUi(
                 () =>
                 {
-                    var dte = (DTE)Marshal.GetActiveObject(string.Format(CultureInfo.InvariantCulture, "VisualStudio.DTE.{0}.0", targetVsVersion));
-                    var projects = dte.Solution.Projects.OfType<Project>()
-                                    .SelectMany(p => p.ProjectItems.OfType<ProjectItem>())
-                                    .Select(p => p.SubProject)
-                                    .Where(s => s != null);
-                    this.ProjectsComboBox.ItemsSource = projects;
+                    ////this.dte = (DTE)Marshal.GetActiveObject(string.Format(CultureInfo.InvariantCulture, "VisualStudio.DTE.{0}.0", CommonMethods.targetVsVersion));
+                    ////var projects = this.dte.Solution.Projects.OfType<Project>()
+                    ////                .SelectMany(p => p.ProjectItems.OfType<ProjectItem>())
+                    ////                .Select(p => p.SubProject)
+                    ////                .Where(s => s != null).ToList();
+
+                    var solution = (IVsSolution)Microsoft.VisualStudio.Shell.Package.GetGlobalService(typeof(IVsSolution));
+                    var projects = CommonMethods.GetProjects(solution).Where(item => item.FullName != string.Empty).ToList();
+                    this.ComboBoxPocoProjects.ItemsSource = projects;
+                    this.ComboBoxDtoProjects.ItemsSource = projects;
+                    this.ComboBoxMapperProjects.ItemsSource = projects;
+                    this.ComboBoxRepoProjects.ItemsSource = projects;
                     this.codeGenerator = new PocoCodeGenerator();
                     this.databaseConnectionEnum = this.RadioButtonSql.IsChecked != null
                                                   && Convert.ToBoolean(this.RadioButtonSql.IsChecked)
@@ -203,15 +218,15 @@ namespace Company.PocoGenerator
         /// </param>
         private void OnProjectsComboBoxSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            this.project = this.ProjectsComboBox.SelectedItem as Project;
-            var directories = Directory.GetDirectories(this.project.GetProjectDir()).Select(dir => dir.Split(new char[] { '\\' }, StringSplitOptions.RemoveEmptyEntries)).Select(tt => tt[tt.Length - 1]).ToList();
-            var result = directories.ToList();
-            foreach (var dir in directories.Where(dir => this.removeDirList.Contains(dir)))
-            {
-                result.Remove(dir);
-            }
+            ////this.project = this.ComboBoxPocoProjects.SelectedItem as Project;
+            ////var directories = Directory.GetDirectories(this.project.GetProjectDir()).Select(dir => dir.Split(new[] { '\\' }, StringSplitOptions.RemoveEmptyEntries)).Select(tt => tt[tt.Length - 1]).ToList();
+            ////var result = directories.ToList();
+            ////foreach (var dir in directories.Where(dir => this.removeDirList.Contains(dir)))
+            ////{
+            ////    result.Remove(dir);
+            ////}
 
-            this.DirectoryListBox.ItemsSource = result;
+            ////this.ComboBoxPocoDirectories.ItemsSource = result;
         }
 
         /// <summary>
@@ -253,7 +268,7 @@ namespace Company.PocoGenerator
                        this.userName,
                        this.password);
 
-                   this.GridGenerate.IsEnabled = result;
+                   ////this.GridGenerate.IsEnabled = result;
                    this.GridDetail.IsEnabled = result;
                    if (result)
                    {
@@ -264,6 +279,7 @@ namespace Company.PocoGenerator
         #endregion
 
         #region Methods
+
         /// <summary>
         /// The on generate command.
         /// </summary>
@@ -275,7 +291,7 @@ namespace Company.PocoGenerator
                     () =>
                     {
                         MessageBox.Show("No project is selected. Plesase select a project");
-                        this.ProjectsComboBox.Focus();
+                        ////this.ProjectsComboBox.Focus();
                     });
 
                 return;
@@ -293,7 +309,7 @@ namespace Company.PocoGenerator
             var list = this.FieldsList.ItemsSource as IEnumerable<FieldDetails>;
             var code = this.codeGenerator.CodeWriter(rootNamespace, this.selectedTableName, list);
             var projectDir = this.project.GetProjectDir();
-            var dir = Convert.ToString(this.DirectoryListBox.SelectedItem);
+            var dir = Convert.ToString(this.ComboBoxPocoDirectories.SelectedItem);
             this.FullPath = Path.Combine(projectDir, dir);
             var classFilePath = Path.Combine(this.FullPath, string.Format(CultureInfo.InvariantCulture, "{0}.cs", this.selectedTableName));
             File.WriteAllText(classFilePath, code);
@@ -309,7 +325,6 @@ namespace Company.PocoGenerator
             this.Dispatcher.CheckBeginInvokeOnUi(
                 () =>
                 {
-
                     this.DatabaseList.ItemsSource = connect.SaveRest();
                 });
         }
@@ -335,11 +350,23 @@ namespace Company.PocoGenerator
             this.Dispatcher.CheckBeginInvokeOnUi(
                 () =>
                 {
-                    this.FieldsList.ItemsSource = DatabaseOperations.ExecuteReaderEx(
-                        "select * from " + tableName,
-                        DatabaseConnectionEnum.Sql, this.serverName, this.userName, this.password);
+                    this.FieldsList.ItemsSource = DatabaseOperations.ExecuteReaderEx("select * from " + tableName, DatabaseConnectionEnum.Sql, this.serverName, this.userName, this.password);
                 });
-        } 
+        }
         #endregion
+
+        /// <summary>
+        /// The on my control on unloaded.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender.
+        /// </param>
+        /// <param name="e">
+        /// The e.
+        /// </param>
+        private void OnMyControlOnUnloaded(object sender, RoutedEventArgs e)
+        {
+            Marshal.ReleaseComObject(this.dte);
+        }
     }
 }

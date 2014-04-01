@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 
 namespace PocoGenerator.Base.Common
 {
+    using System.Runtime.InteropServices;
+    using System.Runtime.InteropServices.ComTypes;
     using System.Windows.Threading;
 
     public static class CustomExtensions
