@@ -1,11 +1,16 @@
 ﻿namespace PocoGenerator.Base.CodeGenerator
 {
+    using System;
     using System.CodeDom.Compiler;
     using System.Collections.Generic;
     using System.Globalization;
     using System.IO;
 
+    using EnvDTE;
+
+    using PocoGenerator.Base.Common;
     using PocoGenerator.Base.Models;
+    using PocoGenerator.Base.ProjectManager;
 
     /// <summary>
     /// The plain objects code generator.
@@ -40,6 +45,26 @@
 
                 return stringWriter.ToString();
             }
+        }
+
+        /// <summary>
+        /// The code writer.
+        /// </summary>
+        /// <param name="project"> The project. </param>
+        /// <param name="nameofClass"> The name of class. </param>
+        /// <param name="fieldDetailses"> The field details. </param>
+        /// <param name="directoryName"> The directory name. </param>
+        /// <returns> The <see cref="bool"/>. </returns>
+        public int CodeWriter(Project project, string nameofClass, IEnumerable<FieldDetails> fieldDetailses, string directoryName)
+        {
+            var rootNamespace = project.GetRootNamespace();
+            var code = this.CodeWriter(rootNamespace, nameofClass, fieldDetailses);
+            var projectDir = project.GetProjectDir();
+            var fullPath = Path.Combine(projectDir, directoryName);
+            var classFilePath = Path.Combine(fullPath, string.Format(CultureInfo.InvariantCulture, "{0}.cs", nameofClass));
+            File.WriteAllText(classFilePath, code);
+            project.ProjectItems.AddFromFile(classFilePath);
+            return ResultCode.ResultCode_SuccessfullyGenerated;
         }
 
         /// <summary>
@@ -84,7 +109,7 @@
                 writer.WriteLine("{");
                 writer.Indent++;
             }
-            
+
             writer.Write("public ");
             writer.Write("class ");
             writer.Write(className);

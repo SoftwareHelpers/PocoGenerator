@@ -193,10 +193,6 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\PocoGenerator.Application\PocoGenerator.Application.csproj">
-      <Project>{53D548AE-AD99-4791-90E8-658C3ECE2ADD}</Project>
-      <Name>PocoGenerator.Application</Name>
-    </ProjectReference>
     <ProjectReference Include="..\PocoGenerator.Base\PocoGenerator.Base.csproj">
       <Project>{D19A9B89-79AD-4246-9195-5D4182954ED4}</Project>
       <Name>PocoGenerator.Base</Name>

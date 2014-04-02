@@ -83,7 +83,7 @@
             <TextBlock Text="Select Directory" Grid.Column="2" Grid.Row="1" Margin="2"/>
             <CheckBox x:Name="CheckBoxPoco" Content="Generate POCO" Grid.Column="0" Grid.Row="2" VerticalAlignment="Center" Margin="2" />
             <ComboBox x:Name="ComboBoxPocoProjects" DisplayMemberPath="Name" Grid.Column="1" Grid.Row="2" Margin="2" IsEnabled="{Binding ElementName=CheckBoxPoco, Path=IsChecked}" SelectionChanged="OnProjectsComboBoxSelectionChanged"/>
-            <ComboBox x:Name="ComboBoxPocoDirectories" DisplayMemberPath="Name" Grid.Column="2" Grid.Row="2" Margin="2" IsEnabled="{Binding ElementName=CheckBoxPoco, Path=IsChecked}"/>
+            <ComboBox x:Name="ComboBoxPocoDirectories" Grid.Column="2" Grid.Row="2" Margin="2" IsEnabled="{Binding ElementName=CheckBoxPoco, Path=IsChecked}"/>
 
             <CheckBox x:Name="CheckBoxDto" Content="Generate DTO" Grid.Column="0" Grid.Row="3" VerticalAlignment="Center" Margin="2" />
             <ComboBox x:Name="ComboBoxDtoProjects" DisplayMemberPath="Name" Grid.Column="1" Grid.Row="3" Margin="2" IsEnabled="{Binding ElementName=CheckBoxDto, Path=IsChecked}"/>

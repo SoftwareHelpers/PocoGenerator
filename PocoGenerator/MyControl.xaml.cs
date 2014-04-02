@@ -6,23 +6,22 @@
     using System.IO;
     using System.Linq;
     using System.Runtime.InteropServices;
-    using System.Runtime.InteropServices.ComTypes;
     using System.Windows;
+    using System.Windows.Controls;
 
     using EnvDTE;
 
-    using Extensibility;
-
-    using global::PocoGenerator.Base.CodeGenerator;
-    using global::PocoGenerator.Base.Common;
-    using global::PocoGenerator.Base.DatabaseManager;
-    using global::PocoGenerator.Base.Models;
     using global::PocoGenerator.Base.ProjectManager;
-    using System.Windows.Controls;
 
     using Microsoft.VisualStudio.Shell.Interop;
 
-    using Process = System.Diagnostics.Process;
+    using global::PocoGenerator.Base.CodeGenerator;
+
+    using global::PocoGenerator.Base.Common;
+
+    using global::PocoGenerator.Base.DatabaseManager;
+
+    using global::PocoGenerator.Base.Models;
 
     /// <summary>
     /// The my control.
@@ -68,7 +67,22 @@
         /// <summary>
         /// The project.
         /// </summary>
-        private Project project;
+        private Project projectForPoco;
+
+        /// <summary>
+        /// The project.
+        /// </summary>
+        private Project projectForDto;
+
+        /// <summary>
+        /// The project.
+        /// </summary>
+        private Project projectForMapper;
+
+        /// <summary>
+        /// The project.
+        /// </summary>
+        private Project projectForRepo;
 
         /// <summary>
         /// The database connection enumeration.
@@ -79,11 +93,6 @@
         /// The remove directory list.
         /// </summary>
         private List<string> removeDirList = new List<string> { "bin", "Properties", "obj" };
-
-        /// <summary>
-        /// The dte.
-        /// </summary>
-        private DTE dte;
 
         #endregion
 
@@ -218,6 +227,39 @@
         /// </param>
         private void OnProjectsComboBoxSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            var combo = (ComboBox)sender;
+            var tempProject = combo.SelectedItem as Project;
+            var directories = Directory.GetDirectories(tempProject.GetProjectDir()).Select(dir => dir.Split(new[] { '\\' }, StringSplitOptions.RemoveEmptyEntries)).Select(tt => tt[tt.Length - 1]).ToList();
+            var result = directories.ToList();
+            foreach (var dir in directories.Where(dir => this.removeDirList.Contains(dir)))
+            {
+                result.Remove(dir);
+            }
+
+            this.Dispatcher.CheckBeginInvokeOnUi(
+                () =>
+                {
+                    switch (combo.Name)
+                    {
+                        case "ComboBoxPocoProjects":
+                            this.ComboBoxPocoDirectories.ItemsSource = result;
+                            this.projectForPoco = combo.SelectedItem as Project;
+                            break;
+                        case "ComboBoxDtoProjects":
+                            this.ComboBoxDtoDirectories.ItemsSource = result;
+                            this.projectForDto = combo.SelectedItem as Project;
+                            break;
+                        case "ComboBoxMapperProjects":
+                            this.ComboBoxMapperDirectories.ItemsSource = result;
+                            this.projectForMapper = combo.SelectedItem as Project;
+                            break;
+                        case "ComboBoxRepoProjects":
+                            this.ComboBoxRepoDirectories.ItemsSource = result;
+                            this.projectForRepo = combo.SelectedItem as Project;
+                            break;
+                    }
+                });
+
             ////this.project = this.ComboBoxPocoProjects.SelectedItem as Project;
             ////var directories = Directory.GetDirectories(this.project.GetProjectDir()).Select(dir => dir.Split(new[] { '\\' }, StringSplitOptions.RemoveEmptyEntries)).Select(tt => tt[tt.Length - 1]).ToList();
             ////var result = directories.ToList();
@@ -268,7 +310,6 @@
                        this.userName,
                        this.password);
 
-                   ////this.GridGenerate.IsEnabled = result;
                    this.GridDetail.IsEnabled = result;
                    if (result)
                    {
@@ -285,35 +326,151 @@
         /// </summary>
         private void OnGenerateCommand()
         {
-            if (this.project == null)
+            try
             {
-                this.Dispatcher.CheckBeginInvokeOnUi(
-                    () =>
-                    {
-                        MessageBox.Show("No project is selected. Plesase select a project");
-                        ////this.ProjectsComboBox.Focus();
-                    });
+                if (this.FieldsList.ItemsSource == null)
+                {
+                    MessageBox.Show("No table is selected. Plesase select a table");
+                    this.FieldsList.Focus();
+                    return;
+                }
 
-                return;
+                var resultPoco = this.GeneratePocoClasses();
+                if (resultPoco != ResultCode.ResultCode_SuccessfullyGenerated)
+                {
+                    this.ShowErrorMessage(resultPoco);
+                    return;
+                }
+
+                var resultDto = this.GenerateDtoClasses();
+                if (resultDto != ResultCode.ResultCode_SuccessfullyGenerated)
+                {
+                    this.ShowErrorMessage(resultDto);
+                    return;
+                }
+
+                var resultMapper = this.GenerateMapperClasses();
+                if (resultMapper != ResultCode.ResultCode_SuccessfullyGenerated)
+                {
+                    this.ShowErrorMessage(resultMapper);
+                    return;
+                }
+
+                var resultRepo = this.GenerateRepoClasses();
+                this.ShowErrorMessage(resultRepo);
+            }
+            catch (Exception exception)
+            {
+                var errorMessage = string.Format(CultureInfo.InvariantCulture, "{0}{1}{2}", "Unable to generate classes", Environment.NewLine, exception.Message);
+                MessageBox.Show(errorMessage);
             }
 
+            ////var rootNamespace = this.projectForPoco.GetRootNamespace();
+            ////var list = this.FieldsList.ItemsSource as IEnumerable<FieldDetails>;
+            ////var code = this.codeGenerator.CodeWriter(rootNamespace, this.selectedTableName, list);
+            ////var projectDir = this.projectForPoco.GetProjectDir();
+            ////var dir = Convert.ToString(this.ComboBoxPocoDirectories.SelectedItem);
+            ////this.FullPath = Path.Combine(projectDir, dir);
+            ////var classFilePath = Path.Combine(this.FullPath, string.Format(CultureInfo.InvariantCulture, "{0}.cs", this.selectedTableName));
+            ////File.WriteAllText(classFilePath, code);
+            ////this.projectForPoco.ProjectItems.AddFromFile(classFilePath);
+        }
 
-            if (this.FieldsList.ItemsSource == null)
+        /// <summary>
+        /// The show error message.
+        /// </summary>
+        /// <param name="resultCode">
+        /// The result code.
+        /// </param>
+        private void ShowErrorMessage(int resultCode)
+        {
+            switch (resultCode)
             {
-                MessageBox.Show("No table is selected. Plesase select a table");
-                this.FieldsList.Focus();
-                return;
+                case ResultCode.ResultCode_SuccessfullyGenerated:
+                    MessageBox.Show(ResultCode.ResultCode_SuccessfullyGenerated_Message);
+                    break;
+                case ResultCode.ResultCode_ProjectNotSelected:
+                    MessageBox.Show(ResultCode.ResultCode_ProjectNotSelected_Message);
+                    break;
+                case ResultCode.ResultCode_UnknownError:
+                    MessageBox.Show(ResultCode.ResultCode_UnknownError_Message);
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// The generate data objects classes.
+        /// </summary>
+        /// <returns>
+        /// The <see cref="bool"/>.
+        /// </returns>
+        private int GenerateDtoClasses()
+        {
+            if (this.projectForDto == null)
+            {
+                MessageBox.Show("No DTO project is selected. Plesase select a project");
+                return ResultCode.ResultCode_ProjectNotSelected;
             }
 
-            var rootNamespace = this.project.GetRootNamespace();
             var list = this.FieldsList.ItemsSource as IEnumerable<FieldDetails>;
-            var code = this.codeGenerator.CodeWriter(rootNamespace, this.selectedTableName, list);
-            var projectDir = this.project.GetProjectDir();
-            var dir = Convert.ToString(this.ComboBoxPocoDirectories.SelectedItem);
-            this.FullPath = Path.Combine(projectDir, dir);
-            var classFilePath = Path.Combine(this.FullPath, string.Format(CultureInfo.InvariantCulture, "{0}.cs", this.selectedTableName));
-            File.WriteAllText(classFilePath, code);
-            this.project.ProjectItems.AddFromFile(classFilePath);
+            return this.codeGenerator.CodeWriter(this.projectForDto, this.selectedTableName, list, this.ComboBoxDtoDirectories.SelectedItem.ToString());
+        }
+
+        /// <summary>
+        /// The generate mapper classes.
+        /// </summary>
+        /// <returns>
+        /// The <see cref="bool"/>.
+        /// </returns>
+        private int GenerateMapperClasses()
+        {
+            if (this.projectForMapper == null)
+            {
+                MessageBox.Show("No Mapper project is selected. Plesase select a project");
+                return ResultCode.ResultCode_ProjectNotSelected;
+            }
+
+            var list = this.FieldsList.ItemsSource as IEnumerable<FieldDetails>;
+            return this.codeGenerator.CodeWriter(this.projectForMapper, this.selectedTableName, list, this.ComboBoxMapperDirectories.SelectedItem.ToString());
+        }
+
+        /// <summary>
+        /// The generate repository classes.
+        /// </summary>
+        /// <returns>
+        /// The <see cref="bool"/>.
+        /// </returns>
+        private int GenerateRepoClasses()
+        {
+            if (this.projectForRepo == null)
+            {
+                MessageBox.Show("No Repository project is selected. Plesase select a project");
+                return ResultCode.ResultCode_ProjectNotSelected;
+            }
+
+            var list = this.FieldsList.ItemsSource as IEnumerable<FieldDetails>;
+            return this.codeGenerator.CodeWriter(this.projectForRepo, this.selectedTableName, list, this.ComboBoxRepoDirectories.SelectedItem.ToString());
+        }
+
+        /// <summary>
+        /// The generate poco classes.
+        /// </summary>
+        /// <returns>
+        /// The <see cref="bool"/>.
+        /// </returns>
+        private int GeneratePocoClasses()
+        {
+            if (this.projectForPoco == null)
+            {
+                MessageBox.Show("No Poco project is selected. Plesase select a project");
+                return ResultCode.ResultCode_ProjectNotSelected;
+            }
+
+
+            var list = this.FieldsList.ItemsSource as IEnumerable<FieldDetails>;
+            var selectedDir = string.Empty;
+            this.Dispatcher.CheckBeginInvokeOnUi(() => selectedDir = Convert.ToString(this.ComboBoxPocoDirectories.SelectedItem));
+            return this.codeGenerator.CodeWriter(this.projectForPoco, this.selectedTableName, list, selectedDir);
         }
 
         /// <summary>
@@ -354,19 +511,5 @@
                 });
         }
         #endregion
-
-        /// <summary>
-        /// The on my control on unloaded.
-        /// </summary>
-        /// <param name="sender">
-        /// The sender.
-        /// </param>
-        /// <param name="e">
-        /// The e.
-        /// </param>
-        private void OnMyControlOnUnloaded(object sender, RoutedEventArgs e)
-        {
-            Marshal.ReleaseComObject(this.dte);
-        }
     }
 }
