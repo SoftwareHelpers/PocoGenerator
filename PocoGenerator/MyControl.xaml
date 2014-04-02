@@ -31,10 +31,8 @@
             <TextBox x:Name="TxtUserName" Grid.Column="1" Grid.Row="2"   Margin="5" Width="150"/>
             <TextBlock Grid.Column="2" Grid.Row="2" Text="Password: "  Margin="5"/>
             <TextBox x:Name="TxtPassword" Grid.Column="3" Grid.Row="2"   Margin="5" Width="150"/>
-            <StackPanel Orientation="Horizontal" Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="4" >
-                <Button x:Name="BtnTestConnection" Content="Test Connection" Margin="5" Click="OnTestConnectionButtonClick" />
-                <TextBlock x:Name="TextBlockConnectionError" VerticalAlignment="Center"/>
-            </StackPanel>
+            <Button x:Name="BtnTestConnection" Grid.Column="0" Grid.Row="3" Content="Test Connection" Margin="5" Click="OnTestConnectionButtonClick" MaxHeight="25" VerticalAlignment="Top" />
+            <TextBlock x:Name="TextBlockConnectionError" Grid.Column="1" Grid.Row="3" Grid.ColumnSpan="4" Margin="5" HorizontalAlignment="Left" VerticalAlignment="Top" TextWrapping="WrapWithOverflow" MaxWidth="600" ToolTip="{Binding ElementName=TextBlockConnectionError, Path=Text}" />
         </Grid>
         <Grid x:Name="GridDetail" Grid.Row="1" Margin="10">
             <Grid.ColumnDefinitions>
@@ -100,6 +98,6 @@
             <ComboBox x:Name="ComboBoxRepoProjects" DisplayMemberPath="Name" Grid.Column="1" Grid.Row="5" Margin="2" IsEnabled="{Binding ElementName=CheckBoxRepo, Path=IsChecked}"/>
             <ComboBox x:Name="ComboBoxRepoDirectories" DisplayMemberPath="Name" Grid.Column="2" Grid.Row="5" Margin="2" IsEnabled="{Binding ElementName=CheckBoxRepo, Path=IsChecked}"/>
         </Grid>
-        <Button Grid.Row="3" Content="Generate" Width="125" HorizontalAlignment="Right" VerticalAlignment="Center" Click="OnGenerateButtonClick" Margin="10"/>
+        <Button Grid.Row="3" Content="Generate" Width="125" HorizontalAlignment="Right" VerticalAlignment="Center" Click="OnGenerateButtonClick" Margin="10" IsEnabled="{Binding ElementName=GridGenerate, Path=IsEnabled}"/>
     </Grid>
 </UserControl>

@@ -1,4 +1,13 @@
-﻿namespace Company.PocoGenerator
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="MyControl.xaml.cs" company="Company">
+//   Copyrights 2014.
+// </copyright>
+// <summary>
+//   The my control.
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
+
+namespace Company.PocoGenerator
 {
     using System;
     using System.Collections.Generic;
@@ -10,6 +19,7 @@
 
     using EnvDTE;
 
+    using Microsoft.VisualStudio.Shell;
     using Microsoft.VisualStudio.Shell.Interop;
 
     using global::PocoGenerator.Base.CodeGenerator;
@@ -22,31 +32,24 @@
 
     using global::PocoGenerator.Base.ProjectManager;
 
+    using Task = System.Threading.Tasks.Task;
+
     /// <summary>
     /// The my control.
     /// </summary>
     public partial class MyControl : UserControl
     {
         #region Variables
+
+        /// <summary>
+        /// The remove directory list.
+        /// </summary>
+        private readonly List<string> removeDirList = new List<string> { "bin", "Properties", "obj" };
+
         /// <summary>
         /// The server name.
         /// </summary>
         private string serverName, userName, password;
-
-        /// <summary>
-        /// The tables list.
-        /// </summary>
-        private List<TableName> tablesList;
-
-        /// <summary>
-        /// The fields list.
-        /// </summary>
-        private List<FieldDetails> fieldsList;
-
-        /// <summary>
-        /// The selected database name.
-        /// </summary>
-        private DatabaseName selectedDatabaseName;
 
         /// <summary>
         /// The code generator.
@@ -87,11 +90,6 @@
         /// The database connection enumeration.
         /// </summary>
         private DatabaseConnectionEnum databaseConnectionEnum;
-
-        /// <summary>
-        /// The remove directory list.
-        /// </summary>
-        private List<string> removeDirList = new List<string> { "bin", "Properties", "obj" };
 
         #endregion
 
@@ -202,7 +200,7 @@
                     ////                .Select(p => p.SubProject)
                     ////                .Where(s => s != null).ToList();
 
-                    var solution = (IVsSolution)Microsoft.VisualStudio.Shell.Package.GetGlobalService(typeof(IVsSolution));
+                    var solution = (IVsSolution)Package.GetGlobalService(typeof(IVsSolution));
                     var projects = CommonMethods.GetProjects(solution).Where(item => item.FullName != string.Empty).ToList();
                     this.ComboBoxPocoProjects.ItemsSource = projects;
                     this.ComboBoxDtoProjects.ItemsSource = projects;
@@ -278,55 +276,57 @@
         /// <param name="e"> The e. </param>
         private void OnTestConnectionButtonClick(object sender, RoutedEventArgs e)
         {
-            this.Dispatcher.CheckBeginInvokeOnUi(
-               () =>
-               {
-                   this.serverName = TxtServerName.Text;
-                   this.userName = TxtUserName.Text;
-                   this.password = TxtPassword.Text;
+            Task.Run(() => this.Dispatcher.CheckBeginInvokeOnUi(
+                () =>
+                {
+                    this.serverName = this.TxtServerName.Text;
+                    this.userName = this.TxtUserName.Text;
+                    this.password = this.TxtPassword.Text;
 
-                   if (string.IsNullOrEmpty(this.serverName))
-                   {
-                       this.TextBlockConnectionError.Text = "Server name cannot be blank.";
-                       this.TxtServerName.Focus();
-                       return;
-                   }
+                    if (string.IsNullOrEmpty(this.serverName))
+                    {
+                        this.TextBlockConnectionError.Text = "Server name cannot be blank.";
+                        this.TxtServerName.Focus();
+                        return;
+                    }
 
-                   if (string.IsNullOrEmpty(this.userName))
-                   {
-                       this.TextBlockConnectionError.Text = "User name cannot be blank.";
-                       this.TxtUserName.Focus();
-                       return;
-                   }
+                    if (string.IsNullOrEmpty(this.userName))
+                    {
+                        this.TextBlockConnectionError.Text = "User name cannot be blank.";
+                        this.TxtUserName.Focus();
+                        return;
+                    }
 
-                   if (string.IsNullOrEmpty(this.password))
-                   {
-                       this.TextBlockConnectionError.Text = "Password cannot be blank.";
-                       this.TxtPassword.Focus();
-                       return;
-                   }
+                    if (string.IsNullOrEmpty(this.password))
+                    {
+                        this.TextBlockConnectionError.Text = "Password cannot be blank.";
+                        this.TxtPassword.Focus();
+                        return;
+                    }
 
-                   var message = string.Empty;
-                   var result = false;
+                    var message = string.Empty;
+                    var result = false;
+                    this.DatabaseList.ItemsSource = new List<DatabaseName>();
+                    this.TablesList.ItemsSource = new List<TableName>();
+                    this.FieldsList.ItemsSource = new List<FieldDetails>();
+                    try
+                    {
+                        result = DatabaseOperations.TestConnection(this.databaseConnectionEnum, this.serverName, this.userName, this.password);
+                    }
+                    catch (Exception exception)
+                    {
+                        message = exception.Message;
+                    }
 
-                   try
-                   {
-                       result = DatabaseOperations.TestConnection(this.databaseConnectionEnum, this.serverName, this.userName, this.password);
-                   }
-                   catch (Exception exception)
-                   {
-                       message = exception.Message;
-                   }
+                    this.GridGenerate.IsEnabled = result;
+                    if (result)
+                    {
+                        this.PopulateDatabases();
+                        message = "Successfully connected.";
+                    }
 
-                   this.GridGenerate.IsEnabled = result;
-                   if (result)
-                   {
-                       this.PopulateDatabases();
-                       message = "Successfully connected.";
-                   }
-
-                   this.TextBlockConnectionError.Text = message;
-               });
+                    this.TextBlockConnectionError.Text = message;
+                }));
         }
         #endregion
 
@@ -337,44 +337,51 @@
         /// </summary>
         private void OnGenerateCommand()
         {
-            try
+            Task.Run(() => this.Dispatcher.CheckBeginInvokeOnUi(
+            () =>
             {
-                if (this.FieldsList.ItemsSource == null)
+                try
                 {
-                    MessageBox.Show("No table is selected. Plesase select a table");
-                    this.FieldsList.Focus();
-                    return;
-                }
+                    if (this.FieldsList.ItemsSource == null)
+                    {
+                        MessageBox.Show("No table is selected. Plesase select a table");
+                        this.FieldsList.Focus();
+                        return;
+                    }
 
-                var resultPoco = this.GeneratePocoClasses();
-                if (resultPoco != ResultCode.ResultCode_SuccessfullyGenerated)
+                    var resultPoco = this.GeneratePocoClasses();
+                    if (resultPoco != ResultCode.ResultCode_SuccessfullyGenerated)
+                    {
+                        this.ShowErrorMessage(resultPoco);
+                        return;
+                    }
+
+                    var resultDto = this.GenerateDtoClasses();
+                    if (resultDto != ResultCode.ResultCode_SuccessfullyGenerated)
+                    {
+                        this.ShowErrorMessage(resultDto);
+                        return;
+                    }
+
+                    var resultMapper = this.GenerateMapperClasses();
+                    if (resultMapper != ResultCode.ResultCode_SuccessfullyGenerated)
+                    {
+                        this.ShowErrorMessage(resultMapper);
+                        return;
+                    }
+
+                    var resultRepo = this.GenerateRepoClasses();
+                    if (resultMapper != ResultCode.ResultCode_SuccessfullyGenerated)
+                    {
+                        this.ShowErrorMessage(resultRepo);
+                    }
+                }
+                catch (Exception exception)
                 {
-                    this.ShowErrorMessage(resultPoco);
-                    return;
+                    var errorMessage = string.Format(CultureInfo.InvariantCulture, "{0}{1}{2}", "Unable to generate classes", Environment.NewLine, exception.Message);
+                    MessageBox.Show(errorMessage);
                 }
-
-                var resultDto = this.GenerateDtoClasses();
-                if (resultDto != ResultCode.ResultCode_SuccessfullyGenerated)
-                {
-                    this.ShowErrorMessage(resultDto);
-                    return;
-                }
-
-                var resultMapper = this.GenerateMapperClasses();
-                if (resultMapper != ResultCode.ResultCode_SuccessfullyGenerated)
-                {
-                    this.ShowErrorMessage(resultMapper);
-                    return;
-                }
-
-                var resultRepo = this.GenerateRepoClasses();
-                this.ShowErrorMessage(resultRepo);
-            }
-            catch (Exception exception)
-            {
-                var errorMessage = string.Format(CultureInfo.InvariantCulture, "{0}{1}{2}", "Unable to generate classes", Environment.NewLine, exception.Message);
-                MessageBox.Show(errorMessage);
-            }
+            }));
 
             ////var rootNamespace = this.projectForPoco.GetRootNamespace();
             ////var list = this.FieldsList.ItemsSource as IEnumerable<FieldDetails>;
@@ -466,9 +473,7 @@
         /// <summary>
         /// The generate poco classes.
         /// </summary>
-        /// <returns>
-        /// The <see cref="bool"/>.
-        /// </returns>
+        /// <returns> The <see cref="bool"/>. </returns>
         private int GeneratePocoClasses()
         {
             if (this.projectForPoco == null)
@@ -476,7 +481,6 @@
                 MessageBox.Show("No Poco project is selected. Plesase select a project");
                 return ResultCode.ResultCode_ProjectNotSelected;
             }
-
 
             var list = this.FieldsList.ItemsSource as IEnumerable<FieldDetails>;
             var selectedDir = string.Empty;

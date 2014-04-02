@@ -1,11 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="DatabaseOperations.cs" company="Company">
+//   Copyrights 2014.
+// </copyright>
+// <summary>
+//   The database operations.
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace PocoGenerator.Base.DatabaseManager
 {
+    using System.Collections.Generic;
     using System.Data;
     using System.Data.Common;
 
@@ -21,8 +25,8 @@ namespace PocoGenerator.Base.DatabaseManager
         /// The test connection.
         /// </summary>
         /// <param name="databaseConnectionEnum"> The database connection enumeration. </param>
-        /// <param name="servername"> The servername. </param>
-        /// <param name="username"> The username. </param>
+        /// <param name="servername"> The server name. </param>
+        /// <param name="username"> The user name. </param>
         /// <param name="password"> The password. </param>
         /// <returns> The <see cref="bool"/>. </returns>
         public static bool TestConnection(DatabaseConnectionEnum databaseConnectionEnum, string servername, string username, string password)
@@ -50,9 +54,12 @@ namespace PocoGenerator.Base.DatabaseManager
         /// <summary>
         /// The execute non query.
         /// </summary>
-        /// <param name="commandText"> The command text. </param>
-        /// <param name="databaseConnectionEnum"> The database connection enumeration. </param>
-        /// <returns> The <see cref="int"/>. </returns>
+        /// <param name="commandText"> The command text.  </param>
+        /// <param name="databaseConnectionEnum"> The database connection enumeration.  </param>
+        /// <param name="serverName"> The server Name. </param>
+        /// <param name="userName"> The user Name. </param>
+        /// <param name="password"> The password. </param>
+        /// <returns> The <see cref="int"/>.  </returns>
         public static int ExecuteNonQuery(string commandText, DatabaseConnectionEnum databaseConnectionEnum, string serverName, string userName, string password)
         {
             using (var connectionFactory = new DatabaseConnection(databaseConnectionEnum, serverName, userName, password))
@@ -79,10 +86,13 @@ namespace PocoGenerator.Base.DatabaseManager
         /// <summary>
         /// The execute reader.
         /// </summary>
-        /// <param name="commandText"> The command text. </param>
-        /// <param name="databaseConnectionEnum"> The database connection enumeration. </param>
-        /// <typeparam name="T">Type of parameter </typeparam>
-        /// <returns> The <see cref="Dictionary{TKey,TValue}.Enumerator"/>. </returns>
+        /// <param name="commandText"> The command text.  </param>
+        /// <param name="databaseConnectionEnum"> The database connection enumeration.  </param>
+        /// <param name="serverName"> The server Name. </param>
+        /// <param name="userName"> The user Name. </param>
+        /// <param name="password"> The password. </param>
+        /// <typeparam name="T"> Type of parameter  </typeparam>
+        /// <returns> The <see cref="Dictionary{TKey,TValue}.Enumerator"/>.  </returns>
         public static IEnumerator<T> ExecuteReader<T>(string commandText, DatabaseConnectionEnum databaseConnectionEnum, string serverName, string userName, string password)
         {
             using (var connectionFactory = new DatabaseConnection(databaseConnectionEnum, serverName, userName, password))
@@ -110,9 +120,12 @@ namespace PocoGenerator.Base.DatabaseManager
         /// <summary>
         /// The execute reader ex.
         /// </summary>
-        /// <param name="commandText"> The command text. </param>
-        /// <param name="databaseConnectionEnum"> The database connection enumeration. </param>
-        /// <returns> The <see cref="IDataReader"/>. </returns>
+        /// <param name="commandText"> The command text.  </param>
+        /// <param name="databaseConnectionEnum"> The database connection enumeration.  </param>
+        /// <param name="serverName"> The server Name. </param>
+        /// <param name="userName"> The user Name. </param>
+        /// <param name="password"> The password. </param>
+        /// <returns> The <see cref="IDataReader"/>.  </returns>
         public static List<FieldDetails> ExecuteReaderEx(string commandText, DatabaseConnectionEnum databaseConnectionEnum, string serverName, string userName, string password)
         {
             using (var connectionFactory = new DatabaseConnection(databaseConnectionEnum, serverName, userName, password))

@@ -1,8 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="DatabaseConnectionEnum.cs" company="Company">
+//   Copyrights 2014.
+// </copyright>
+// <summary>
+//   The database connection enumeration.
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace PocoGenerator.Base.Common
 {

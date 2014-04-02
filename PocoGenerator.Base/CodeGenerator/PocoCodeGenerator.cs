@@ -1,4 +1,13 @@
-﻿namespace PocoGenerator.Base.CodeGenerator
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="PocoCodeGenerator.cs" company="Company">
+//   Copyrights 2014.
+// </copyright>
+// <summary>
+//   The plain objects code generator.
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
+
+namespace PocoGenerator.Base.CodeGenerator
 {
     using System;
     using System.CodeDom.Compiler;

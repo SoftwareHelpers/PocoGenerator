@@ -84,7 +84,7 @@
   <ItemGroup>
     <Compile Include="CodeGenerator\ICodeGenerator.cs" />
     <Compile Include="CodeGenerator\PocoCodeGenerator.cs" />
-    <Compile Include="Common\CommonExtensions.cs" />
+    <Compile Include="Common\CustomExtensions.cs" />
     <Compile Include="Common\DatabaseConnectionEnum.cs" />
     <Compile Include="Common\DataObjectFieldAttribute.cs" />
     <Compile Include="Common\EnumerableExtensions.cs" />

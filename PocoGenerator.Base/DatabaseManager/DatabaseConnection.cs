@@ -1,12 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="DatabaseConnection.cs" company="Company">
+//   Copyrights 2014.
+// </copyright>
+// <summary>
+//   The database connection.
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace PocoGenerator.Base.DatabaseManager
 {
-    using System.Configuration;
+    using System;
     using System.Data;
     using System.Data.Common;
     using System.Globalization;
@@ -35,6 +38,15 @@ namespace PocoGenerator.Base.DatabaseManager
         /// </summary>
         /// <param name="databaseConnectionEnum">
         /// The database connection enumeration.
+        /// </param>
+        /// <param name="servername">
+        /// The server name.
+        /// </param>
+        /// <param name="username">
+        /// The user name.
+        /// </param>
+        /// <param name="password">
+        /// The password.
         /// </param>
         public DatabaseConnection(DatabaseConnectionEnum databaseConnectionEnum, string servername, string username, string password)
         {
@@ -192,6 +204,15 @@ namespace PocoGenerator.Base.DatabaseManager
         /// <summary>
         /// The open sql connection.
         /// </summary>
+        /// <param name="servername">
+        /// The server name.
+        /// </param>
+        /// <param name="username">
+        /// The user name.
+        /// </param>
+        /// <param name="password">
+        /// The password.
+        /// </param>
         private void CreateSqlConnection(string servername, string username, string password)
         {
             var databaseProviderFactories = DbProviderFactories.GetFactory("System.Data.SqlClient");
@@ -210,6 +231,15 @@ namespace PocoGenerator.Base.DatabaseManager
         /// <summary>
         /// The open postgre connection.
         /// </summary>
+        /// <param name="servername">
+        /// The server name.
+        /// </param>
+        /// <param name="username">
+        /// The user name.
+        /// </param>
+        /// <param name="password">
+        /// The password.
+        /// </param>
         private void CreatePostgreConnection(string servername, string username, string password)
         {
             var array = servername.Split(new[] { ':' }, StringSplitOptions.RemoveEmptyEntries);

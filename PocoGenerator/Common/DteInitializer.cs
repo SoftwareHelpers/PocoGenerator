@@ -1,20 +1,48 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="DteInitializer.cs" company="Company">
+//   Copyrights 2014.
+// </copyright>
+// <summary>
+//   The dte initializer.
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace Company.PocoGenerator
 {
+    using System;
+
     using Microsoft.VisualStudio;
     using Microsoft.VisualStudio.Shell.Interop;
 
+    /// <summary>
+    /// The dte initializer.
+    /// </summary>
     public class DteInitializer : IVsShellPropertyEvents
     {
+        /// <summary>
+        /// The shell service.
+        /// </summary>
         private IVsShell shellService;
+
+        /// <summary>
+        /// The cookie.
+        /// </summary>
         private uint cookie;
+
+        /// <summary>
+        /// The callback.
+        /// </summary>
         private Action callback;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DteInitializer"/> class.
+        /// </summary>
+        /// <param name="shellService">
+        /// The shell service.
+        /// </param>
+        /// <param name="callback">
+        /// The callback.
+        /// </param>
         internal DteInitializer(IVsShell shellService, Action callback)
         {
             int hr;
@@ -28,6 +56,18 @@ namespace Company.PocoGenerator
             Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(hr);
         }
 
+        /// <summary>
+        /// The on shell property change.
+        /// </summary>
+        /// <param name="propid">
+        /// The property id.
+        /// </param>
+        /// <param name="var">
+        /// The variable.
+        /// </param>
+        /// <returns>
+        /// The <see cref="int"/>.
+        /// </returns>
         int IVsShellPropertyEvents.OnShellPropertyChange(int propid, object var)
         {
             int hr;
@@ -49,8 +89,8 @@ namespace Company.PocoGenerator
                     this.callback();
                 }
             }
+
             return VSConstants.S_OK;
         }
     }
-
 }

@@ -1,11 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="DataObjectFieldAttribute.cs" company="Company">
+//   Copyrights 2014.
+// </copyright>
+// <summary>
+//   The data object field attribute.
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace PocoGenerator.Base.Common
 {
+    using System;
+
     /// <summary>
     /// The data object field attribute.
     /// </summary>
