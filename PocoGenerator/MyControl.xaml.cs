@@ -5,13 +5,10 @@
     using System.Globalization;
     using System.IO;
     using System.Linq;
-    using System.Runtime.InteropServices;
     using System.Windows;
     using System.Windows.Controls;
 
     using EnvDTE;
-
-    using global::PocoGenerator.Base.ProjectManager;
 
     using Microsoft.VisualStudio.Shell.Interop;
 
@@ -22,6 +19,8 @@
     using global::PocoGenerator.Base.DatabaseManager;
 
     using global::PocoGenerator.Base.Models;
+
+    using global::PocoGenerator.Base.ProjectManager;
 
     /// <summary>
     /// The my control.
@@ -196,6 +195,7 @@
             this.Dispatcher.CheckBeginInvokeOnUi(
                 () =>
                 {
+                    this.GridGenerate.IsEnabled = false;
                     ////this.dte = (DTE)Marshal.GetActiveObject(string.Format(CultureInfo.InvariantCulture, "VisualStudio.DTE.{0}.0", CommonMethods.targetVsVersion));
                     ////var projects = this.dte.Solution.Projects.OfType<Project>()
                     ////                .SelectMany(p => p.ProjectItems.OfType<ProjectItem>())
@@ -274,12 +274,8 @@
         /// <summary>
         /// The button test connection_ on click.
         /// </summary>
-        /// <param name="sender">
-        /// The sender.
-        /// </param>
-        /// <param name="e">
-        /// The e.
-        /// </param>
+        /// <param name="sender"> The sender. </param>
+        /// <param name="e"> The e. </param>
         private void OnTestConnectionButtonClick(object sender, RoutedEventArgs e)
         {
             this.Dispatcher.CheckBeginInvokeOnUi(
@@ -291,30 +287,45 @@
 
                    if (string.IsNullOrEmpty(this.serverName))
                    {
+                       this.TextBlockConnectionError.Text = "Server name cannot be blank.";
+                       this.TxtServerName.Focus();
                        return;
                    }
 
                    if (string.IsNullOrEmpty(this.userName))
                    {
+                       this.TextBlockConnectionError.Text = "User name cannot be blank.";
+                       this.TxtUserName.Focus();
                        return;
                    }
 
                    if (string.IsNullOrEmpty(this.password))
                    {
+                       this.TextBlockConnectionError.Text = "Password cannot be blank.";
+                       this.TxtPassword.Focus();
                        return;
                    }
 
-                   var result = DatabaseOperations.TestConnection(
-                       this.databaseConnectionEnum,
-                       this.serverName,
-                       this.userName,
-                       this.password);
+                   var message = string.Empty;
+                   var result = false;
 
-                   this.GridDetail.IsEnabled = result;
+                   try
+                   {
+                       result = DatabaseOperations.TestConnection(this.databaseConnectionEnum, this.serverName, this.userName, this.password);
+                   }
+                   catch (Exception exception)
+                   {
+                       message = exception.Message;
+                   }
+
+                   this.GridGenerate.IsEnabled = result;
                    if (result)
                    {
                        this.PopulateDatabases();
+                       message = "Successfully connected.";
                    }
+
+                   this.TextBlockConnectionError.Text = message;
                });
         }
         #endregion
@@ -478,7 +489,7 @@
         /// </summary>
         private void PopulateDatabases()
         {
-            var connect = DatabaseOperations.ExecuteReader<DatabaseName>("select Name from master.dbo.sysdatabases", DatabaseConnectionEnum.Sql, this.serverName, this.userName, this.password);
+            var connect = DatabaseOperations.ExecuteReader<DatabaseName>("SELECT Name FROM master.dbo.sysdatabases", DatabaseConnectionEnum.Sql, this.serverName, this.userName, this.password);
             this.Dispatcher.CheckBeginInvokeOnUi(
                 () =>
                 {
@@ -507,7 +518,7 @@
             this.Dispatcher.CheckBeginInvokeOnUi(
                 () =>
                 {
-                    this.FieldsList.ItemsSource = DatabaseOperations.ExecuteReaderEx("select * from " + tableName, DatabaseConnectionEnum.Sql, this.serverName, this.userName, this.password);
+                    this.FieldsList.ItemsSource = DatabaseOperations.ExecuteReaderEx("select * FROM " + tableName, DatabaseConnectionEnum.Sql, this.serverName, this.userName, this.password);
                 });
         }
         #endregion
