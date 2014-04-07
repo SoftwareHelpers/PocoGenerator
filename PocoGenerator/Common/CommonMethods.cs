@@ -127,27 +127,13 @@ namespace Company.PocoGenerator
         /// <param name="solution">
         /// The solution.
         /// </param>
-        /// <returns>
-        /// The <see cref="IEnumerable"/>.
-        /// </returns>
-        public static IEnumerable<IVsHierarchy> GetProjectsInSolution(IVsSolution solution)
-        {
-            return GetProjectsInSolution(solution, __VSENUMPROJFLAGS.EPF_LOADEDINSOLUTION);
-        }
-
-        /// <summary>
-        /// The get projects in solution.
-        /// </summary>
-        /// <param name="solution">
-        /// The solution.
-        /// </param>
         /// <param name="flags">
         /// The flags.
         /// </param>
         /// <returns>
         /// The <see cref="IEnumerable"/>.
         /// </returns>
-        public static IEnumerable<IVsHierarchy> GetProjectsInSolution(IVsSolution solution, __VSENUMPROJFLAGS flags)
+        public static IEnumerable<IVsHierarchy> GetProjectsInSolution(IVsSolution solution, __VSENUMPROJFLAGS flags = __VSENUMPROJFLAGS.EPF_LOADEDINSOLUTION)
         {
             if (solution == null)
             {
